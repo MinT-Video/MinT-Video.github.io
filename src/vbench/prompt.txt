@@ -1,0 +1,162 @@
+Instructions:
+Please help me enrich the user prompt for video generation. Given a single text prompt, you need to extend it to a list of temporal captions and a global caption. The goal is to enhance the short user prompt and provide more context to the video generator, so that the generated video contains more detailed and coherent events. Please focus solely on visual elements and actions without mentioning ambient sounds or other non-visual sensory details.
+
+The temporal captions describe sequential events happening in the scene and their start and end timestamps. It should follow these rules:
+1. Each event should maintain similar entities and background scenes.
+2. Each event prompt must contain only a single motion or action.
+3. Each event prompt can be easily described by a video clip shorter than 5s.
+4. The event timestamps are normalized into [0, 1]. It should reflect the time needed to perform each action in real world which is usually different between events.
+5. Each event should be smoothly connected to its adjacent events, i.e., they can be plausibly presented in a video without any cuts.
+6. Each event prompt can also contain the camera motion at the beginning if it is important to the event.
+7. There should be no more than 4 events.
+8. The whole video should not exceed 20s.
+
+The global caption is a general description of the scene containing:
+1. The background of the scene such as the spatial layout of objects.
+2. The main entities involved in the scene and their attributes, such as clothing, age, and appearance of a person.
+3. The weather if it is an outdoor scene.
+4. Camera angles and movements if they are important to the scene.
+
+If the person filming the video is also involved in the video, please refer to them as "#camera-operator#".
+
+Common camera descriptions can be a combination of the following:
+- Long shot
+- Medium shot
+- Close-up shot
+- Bird's-eye view
+- High-angle shot
+- Eye level
+- Low-angle shot
+- Pan
+- Tilt
+- Dolly
+- Zoom
+- Truck
+- Pedestal
+
+Example 1:
+Input: "A man in the gym shows how to do exercises."
+Output (in json format):
+```
+{
+  "event_0": {
+    "start": 0.0,
+    "end": 0.281,
+    "text": "A static camera shows the man speaking."
+  },
+  "event_1": {
+    "start": 0.281,
+    "end": 0.576,
+    "text": "The camera zooms in showing the man walking back."
+  },
+  "event_2": {
+    "start": 0.576,
+    "end": 1.0,
+    "text": "The camera pans left showing the man putting a bottle on the floor and taking up a dumbbell."
+  },
+  "global_text": "A low angle, full shot from a static camera of a dark-skinned man in the gym. The gym has a white tile ceiling, light grey walls with mirrors, and a grey floor. On the ceiling is a yellow ventilation tube. The man is leaning on the horizontal bar and speaks to a camera. In the background is a grey-yellow training equipment."
+}
+```
+
+Example 2:
+Input: "A man eats ice cream."
+Output (in json format):
+```
+{
+  "event_0": {
+    "start": 0.0,
+    "end": 0.341,
+    "text": "The right hand of the #camera-operator# holds and points a yellow cup with yellow ice cream into the camera."
+  },
+  "event_1": {
+    "start": 0.341,
+    "end": 0.673,
+    "text": "The right hand of the #camera-operator# places the yellow cup with yellow ice cream on the gray table."
+  },
+  "event_2": {
+    "start": 0.673,
+    "end": 1.0,
+    "text": "The right hand of the #camera-operator# takes a transparent spoon with a piece of yellow ice cream."
+  },
+  "global_text": "A handheld camera shows a full, high-angle shot of the tan-skinned right hand of a #camera-operator# holding a yellow cup of yellow ice cream and a clear plastic spoon. The cup has drawings and red and black text. In the background is a gray countertop with various packages of blue and purple."
+}
+```
+
+Example 3:
+Input: "A man plays with a VR headset with excited reactions."
+Output (in json format):
+```
+{
+  "event_0": {
+    "start": 0.0,
+    "end": 0.112,
+    "text": "A man holds the VR headset in his hands."
+  },
+  "event_1": {
+    "start": 0.112,
+    "end": 0.235,
+    "text": "The man places the VR headset on his head."
+  },
+  "event_2": {
+    "start": 0.235,
+    "end": 0.580,
+    "text": "The man lowers his hands and looks around."
+  },
+  "event_3": {
+    "start": 0.580,
+    "end": 1.0,
+    "text": "The man tilts his hands left and right and smiles."
+  },
+  "global_text": "A medium shot from a handheld camera shows a fair-skinned man standing in a living room wearing a virtual reality headset and reacting to the VR experience. The camera pans to the right and left and dollies backward and forward. He has black hair, a beard, and a mustache. He wears a horizontally green-white striped t-shirt, beige trousers, and black thread on his left wrist. In the background are a light brown couch and a dark glass window with wooden frames, a lamp on the right side, several green plants, and a stand on the left with several items held like a white round clock, books, a photo frame, and a green plant in a white pot."
+}
+```
+
+Example 4:
+Input: "A shop assitant checks fruit in a shop and confirms on a tablet."
+Output (in json format):
+```
+{
+  "event_0": {
+    "start": 0.0,
+    "end": 0.300,
+    "text": "The camera slightly tilts up and pans to the left, showing the man walks up to the counter, looks at the counter and supports the tablet with both hands."
+  },
+  "event_1": {
+    "start": 0.300,
+    "end": 0.684,
+    "text": "The camera tilts down, showing the man picks up the yellow mango with his right hand, turns it around in his hand and puts it back."
+  },
+  "event_2": {
+    "start": 0.684,
+    "end": 1.0,
+    "text": "The camera tilts up and down, slightly pans to the left, showing the man touches the tablet screen with his index finger of the left hand and scrolls up and down the screen."
+  },
+  "global_text": "An eye-level medium shot from a handheld shaky camera of a light-skinned shop assistant checking fruit for freshness. This is the older man with grey hair and eyeglasses, wearing a blue face mask, a blue shirt, brown trousers and a black apron with brown straps. The man holds a grey tablet in his left hand while checking the fruit with his right hand. There are melons, mangoes, avocados, bananas and pomegranates are on the counter on the right, with price tags for the fruit on the grey stand on the right. It's a well-lit shop with white walls, a light floor, counters on the left displaying food items, and shelves with green packs."
+}
+```
+
+Example 5:
+Input: "A person makes popcorn in a microwave and then puts it on a table."
+Output (in json format):
+```
+{
+  "event_0": {
+    "start": 0.0,
+    "end": 0.345,
+    "text": "The camera dollies backward and tilts down dollies forward and shows how the #camera-operator# opening a gray microwave and taking out a can of popcorn with a red lid."
+  },
+  "event_1": {
+    "start": 0.345,
+    "end": 0.721,
+    "text": "The camera dollies backward tilts up and pans to the left and shows how the #camera-operator# placing a can of popcorn on a black marble counter top in a kitchen with brown furniture and a green wall."
+  },
+  "event_2": {
+    "start": 0.721,
+    "end": 1.0,
+    "text": "The camera shakes and pans to the left, showing the #camera-operator# pulling the red lid off the popcorn can."
+  },
+  "global_text": "A high angle medium close-up, the handheld camera shows the fair-skinned right hand of the #camera operator# who opens the gray microwave, in the microwave there is a transparent decanter with a red lid, which contains popcorn. Underneath the microwave is a bedside table with white doors and a brown tabletop. To the right is a kitchen with brown hanging furniture in red frames. The green wall is tattered with orange paint. Below is a blue marble tabletop, on the tabletop there are: a cardboard box from a transparent mug, a metal knife, a plastic transparent container, a white plastic lid on the side. Under the wall are many small transparent bottles with labels and red caps. On the left are white washbasins with a metal screen."
+}
+```
+
+Now, please extend the following text prompt:
