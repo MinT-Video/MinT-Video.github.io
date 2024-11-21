@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="MinT" />
+        <meta name="author" content="anonymous" />
+
+        <title>MinT</title>
+        <!-- Bootstrap core CSS -->
+        <!--link href="bootstrap.min.css" rel="stylesheet"-->
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+            crossorigin="anonymous"
+        />
+
+        <!-- Custom styles for this template -->
+        <link href="offcanvas.css" rel="stylesheet" />
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <!--    <link rel="icon" href="img/favicon.gif" type="image/gif">-->
+        <style type="text/css">
+            .container {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 860px;
+                font-size: 16px;
+            }
+            .container_title {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 1000px;
+                font-size: 18px;
+            }
+            .container_video_1600 {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 1600px;
+            }
+            .container_video_1200 {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 1200px;
+            }
+            table {
+                width: 100%;
+                text-align: center;
+                table-layout: fixed;
+                border-collapse: collapse;
+            }
+            th {
+                position: sticky;
+                top: 0;
+                background-color: #f9f9f9;
+                z-index: 10;
+                font-size: 1.25em; /* Adjust font size to be larger, similar to <h5> */
+                padding: 10px; /* Add padding for a larger header area */
+            }
+            .play-button {
+                display: inline-flex;
+                align-items: center;
+                background-color: #e0e0e0; /* Light gray background */
+                border: none;
+                border-radius: 8px; /* Rounded corners */
+                padding: 8px 16px; /* Padding inside the button */
+                font-size: 18px;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+                margin-left: 10px;
+            }
+            .play-button i {
+                margin-right: 10px;
+            }
+        </style>
+
+        <!-- MathJax -->
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+              tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                processEscapes: true
+              }
+            });
+        </script>
+
+        <script
+            type="text/javascript"
+            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+        ></script>
+    </head>
+
+    <body>
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container_title" align="center">
+                <h2>
+                    Mind the Time: Temporally-Controlled Multi-Event Video Generation
+                </h2>
+                <h4><i>CVPR 2025 Submission</i></h4>
+                <p>
+                    Anonymous Author(s)
+                </p>
+                <p>
+                    The website is best viewed in Chrome
+                </p>
+            </div>
+        </div>
+
+        <!--------------------- Teaser Video --------------------->
+        <br />
+        <div class="container">
+            <div align="center"><h2>Overview Video</h2></div>
+            <hr />
+            <video style="width: 100%;" muted controls preload="none"><source src="src/Teaser.mp4" type="video/mp4"></video>
+            <hr />
+            <br />
+        </div>
+
+        <!--------------------- Abstract --------------------->
+        <!-- <br />
+        <div class="container">
+            <div align="center"><h2>Abstract</h2></div>
+            <hr />
+            <p>
+                Real-world videos consist of sequences of events.
+                Generating such sequences with precise temporal control is infeasible with existing video generators that rely on a single paragraph of text as input.
+                When tasked with generating multiple events described using a single prompt, such methods often ignore some of the events or fail to arrange them in the correct order.
+                To address this limitation, we present MinT, a multi-event video generator with temporal control.
+                Our key insight is to bind each event to a specific period in the generated video, which allows the model to focus on one event at a time.
+                To enable time-aware interactions between event captions and video tokens, we design a time-based positional encoding method, dubbed ReRoPE.
+                This encoding helps to guide the cross-attention operation.
+                By fine-tuning a pre-trained video diffusion transformer on temporally grounded data, our approach produces coherent videos with smoothly connected events.
+                For the first time in the literature, our model offers control over the timing of events in generated videos.
+                Extensive experiments demonstrate that MinT outperforms existing open-source models by a large margin.
+            </p>
+        </div> -->
+
+        <!--------------------- Method --------------------->
+        <!-- <br />
+        <div class="container">
+            <div align="center"><h2>Method</h2></div>
+            <hr />
+        </div>
+        <div class="container">
+            <p align="center">
+                <img src="src/figs/pipeline.png" style="width: 100%"/>
+            </p>
+        </div>
+        <div class="container">
+            <p>
+                <strong>(a)</strong> Our model takes in a global caption, a list of temporal captions, and scene cut conditioning (optional).
+                Each temporal caption and scene cut is binded to a time span in the video.
+                <br />
+                <strong>(b)</strong> To condition on time-based event captions, we introduce a new temporal cross-attention layer in the DiT block.
+                <br />
+                <strong>(c)</strong> We design a novel Rescaled Rotary Position Embedding (ReRoPE) to indicate temporal correspondence between video tokens and event captions & scene cut tokens (optional).
+                This allows MinT to control the start and end time of events and the shot transition time.
+            </p>
+        </div> -->
+
+        <!--------------------- Qualitative Results --------------------->
+        <br />
+        <div class="container" id="more-our-results">
+            <div align="center"><h2>Qualitative Results</h2></div>
+            <hr />
+            <p>
+                Here, we show some high-resolution videos (1024x576).
+                We use colored borders and subtitles to indicate the time period of each event.
+                We first play the video with a pause before each event, and then play it continuously again.
+                You can find more 512x288 videos (the resolution we used for the paper) <a href="./src/more_ours_qual.html">here</a>.
+            </p>
+        </div>
+        <div class="container_title">
+            <table style="width: 100%; text-align: center; table-layout: fixed;">
+            <tr>
+                <td style="width: 50%;"><video class="myVideo" style="width: 100%;" muted controls autoplay preload="none">
+                    <source src="src/more_ours_qual/res1024-man_poses_hard-3_subtitle.mp4" type="video/mp4">
+                </video></td>
+                <td style="width: 50%;"><video class="myVideo" style="width: 100%;" muted controls autoplay preload="none">
+                    <source src="src/more_ours_qual/res1024-woman_poses-6_subtitle.mp4" type="video/mp4">
+                </video></td>
+            </tr>
+            <tr style="height: 20px;"><td colspan="2"></td></tr>  <!-- vspace -->
+            <tr>
+                <td style="width: 50%;"><video class="myVideo" style="width: 100%;" muted controls autoplay preload="none">
+                    <source src="src/more_ours_qual/res1024-woman_gesture-1_subtitle.mp4" type="video/mp4">
+                </video></td>
+                <td style="width: 50%;"><video class="myVideo" style="width: 100%;" muted controls autoplay preload="none">
+                    <source src="src/more_ours_qual/res1024-cat_explore_look3-57_subtitle.mp4" type="video/mp4">
+                </video></td>
+            </tr>
+            </table>
+            <hr />
+            <br />
+        </div>
+
+        <!--------------------- Compare with SOTA --------------------->
+        <div class="container" id="compare-with-sota">
+            <div align="center">
+                <h3>Comparison with SOTA Models</h3>
+            </div>
+            <hr />
+            <p>
+                Existing video generators struggle with sequential event generation.
+                We compare with SOTA open-source models CogVideoX-5B [1] and Mochi 1 [2], and commercial models Kling 1.5 [3] and Gen3-Alpha [4].
+                <strong>We concatenate all temporal captions to one long prompt, and run their online APIs to generate videos.</strong>
+                The prompt we used for SOTA models can be found at <a href="./src/vs_sota/prompts.txt">prompts</a>.
+                <br />
+                <strong>Existing models often miss some events in the result, or merge multiple events and confuse their orders.</strong>
+                In contrast, MinT synthesizes all events seamlessly following their desired time spans.
+                Please refer to paper Appendix C.6 for more analysis on SOTA model behaviors.
+                Check out more comparisons <a href="./src/vs_sota_qual.html">here</a>.
+            </p>
+        </div>
+        <div class="container_video_1600">
+            <hr />
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Temporal Captions</th>
+                        <th style="width: 15%;">MinT <strong>(<span style="color: #ff0000;">Ours</span>)</strong></th>
+                        <th style="width: 15%;">CogVideoX-5B</th>
+                        <th style="width: 15%;">Mochi 1</th>
+                        <th style="width: 15%;">Kling 1.5</th>
+                        <th style="width: 15%;">Gen-3 Alpha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="width: 25%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 2.3s]: A man lifts up his head and raises up both arms.</span><br />
+                        <span style="color: #38761d;">[2.3s → 4.5s]: The man lowers down his head and puts down both arms.</span><br />
+                        <span style="color: #741a48;">[4.5s → 6.8s]: The man turns his head to the right and extends both arms to the right.</span><br />
+                        <span style="color: #0076b9;">[6.8s → 9.1s]: The man turns his head to the left and extends both arms to the left.</span><br />
+                        <br />
+                        Playback Speed:
+                        <select id="speedSelector01" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row01', 'speedSelector01')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                    <td style="width: 15%;"><video class="row01" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/man_arms_actions_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row01" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/cogvideox-man_arms_actions-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row01" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/mochi-man_arms_actions-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row01" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/kling-man_arms_actions-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row01" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/gen3-man_arms_actions-resize_512.mp4" type="video/mp4"></video></td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 2.3s]: A young man typing on the laptop keyboard with both hands.</span><br />
+                        <span style="color: #38761d;">[2.3s → 4.5s]: The man touches the headphones with his right hand.</span><br />
+                        <span style="color: #741a48;">[4.5s → 6.5s]: The man closes the laptop with his left hand.</span><br />
+                        <span style="color: #0076b9;">[6.5s → 9.1s]: The man stands up.</span><br />
+                        <br />
+                        Playback Speed:
+                        <select id="speedSelector02" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row02', 'speedSelector02')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                    <td style="width: 15%;"><video class="row02" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/man_laptop_actions_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row02" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/cogvideox-man_laptop_actions-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row02" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/mochi-man_laptop_actions-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row02" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/kling-man_laptop_actions-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row02" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/gen3-man_laptop_actions-resize_512.mp4" type="video/mp4"></video></td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 1.8s]: The woman is holding the phone in her left hand, looking at it while tapping on it with her right hand.</span><br />
+                        <span style="color: #38761d;">[1.8s → 3.8s]: The woman holds the phone with both hands, extending them forward at face level to take a selfie.</span><br />
+                        <span style="color: #741a48;">[3.8s → 7.0s]: The woman lowers the phone and begins typing on it with her right hand.</span><br />
+                        <span style="color: #0076b9;">[7.0s → 12.2s]: The woman adjusts her hair with her right hand, tucking it behind her left ear.</span><br />
+                        <br />
+                        Playback Speed:
+                        <select id="speedSelector1" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row1', 'speedSelector1')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                    <td style="width: 15%;"><video class="row1" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/072_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row1" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/cogvideox-72-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row1" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/mochi-72-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row1" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/kling-72-compressed-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row1" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/gen3-72-resize_512.mp4" type="video/mp4"></video></td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 1.2s]: The man holds an tablet with his left hand and uses it with his right hand.</span><br />
+                        <span style="color: #38761d;">[1.2s → 5.6s]: The man looks at the blue bottles on his left and points his right hand towards them.</span><br />
+                        <span style="color: #741a48;">[5.6s → 6.5s]: The man looks at the tablet and uses it with his right hand.</span><br />
+                        <span style="color: #0076b9;">[6.5s → 12.2s]: The man looks at the camera while holding the tablet with his left hand.</span><br />
+                        <br />
+                        Playback Speed:
+                        <select id="speedSelector2" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row2', 'speedSelector2')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                    <td style="width: 15%;"><video class="row2" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/061_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row2" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/cogvideox-61-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row2" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/mochi-61-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row2" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/kling-61-compressed-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row2" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/gen3-61-resize_512.mp4" type="video/mp4"></video></td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 2.1s]: The woman waves with her right hand.</span><br />
+                        <span style="color: #38761d;">[2.1s → 7.5s]: The woman talks gesturing with her hands.</span><br />
+                        <span style="color: #741a48;">[7.5s → 10.5s]: The woman makes a heart gesture.</span><br />
+                        <span style="color: #0076b9;">[10.5s → 12.2s]: The woman gives a blow kiss with her right hand.</span><br />
+                        <br />
+                        Playback Speed:
+                        <select id="speedSelector3" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row3', 'speedSelector3')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                    <td style="width: 15%;"><video class="row3" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/130_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row3" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/cogvideox-130-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row3" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/mochi-130-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row3" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/kling-130-compressed-resize_512.mp4" type="video/mp4"></video></td>
+                    <td style="width: 15%;"><video class="row3" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/gen3-130-resize_512.mp4" type="video/mp4"></video></td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <br />
+        </div>
+
+        <!--------------------- OOD Prompts Results --------------------->
+        <div class="container" id="ood-results">
+            <div align="center">
+                <h3>MinT Results on OOD Prompts</h3>
+            </div>
+            <hr />
+            <p>
+                MinT is fine-tuned on temporal caption videos that mostly describe human-centric events.
+                Yet, we show that our model still possesses the base model's ability to generate novel concepts.
+                Here, we show videos generated by MinT conditioned on out-of-distribution prompts.
+                Check out more OOD results <a href="./src/ood_ours_qual.html">here</a>.
+            </p>
+        </div>
+        <div class="container">
+            <div align="center">
+                <h5>
+                    <table style="width: 100%; text-align: center">
+                        <tr>
+                            <td style="width: 60%">Temporal Captions</td>
+                            <td style="width: 40%">MinT <strong>(Ours)</strong></td>
+                        </tr>
+                    </table>
+                </h5>
+            </div>
+            <table style="width: 100%; text-align: center; table-layout: fixed;">
+            <tr>
+                <td style="width: 60%; text-align: left;">
+                    <span style="color: #b45f06;">[0.0s → 2.4s]: A sweeping crane shot reveals two warriors on the edge of the rugged cliffs, swords at the ready.</span><br />
+                    <span style="color: #38761d;">[2.4s → 4.3s]: One warrior advances, swinging his sword in a wide arc aimed at his opponent's side.</span><br />    
+                    <span style="color: #741a48;">[4.3s → 6.7s]: The other warrior parries the attack, causing a shower of sparks to fly from the swords' contact.</span><br />
+                    <span style="color: #0076b9;">[6.7s → 9.1s]: The camera cranes up to capture both warriors circling each other, blades poised.</span>
+                </td>
+                <td style="width: 40%;"><video class="myVideo" style="width: 100%;" muted controls autoplay preload="none">
+                    <source src="src/ood/34-1_subtitle.mp4" type="video/mp4">
+                </video></td>
+            </tr>
+            <tr style="height: 20px;"><td colspan="2"></td></tr>  <!-- vspace -->
+            <tr>
+                <td style="width: 60%; text-align: left;">
+                    <span style="color: #b45f06;">[0.0s → 2.3s]: The astronaut bends forward to pick up a sparker from a metal container on the table.</span><br />
+                    <span style="color: #38761d;">[2.3s → 4.5s]: The astronaut lights up a sparkler with a matchstick.</span><br />
+                    <span style="color: #741a48;">[4.5s → 6.8s]: The astronaut waves the lit sparkler in a circle, leaving a trail of glowing sparkles.</span><br />
+                    <span style="color: #0076b9;">[6.8s → 9.1s]: The astronaut holds up the sparkler at eye level and admires the burst of colorful sparks.</span>
+                </td>
+                <td style="width: 40%;"><video class="myVideo" style="width: 100%;" muted controls autoplay preload="none">
+                    <source src="src/ood/32-0_subtitle.mp4" type="video/mp4">
+                </video></td>
+            </tr>
+            </table>
+            <hr />
+            <br />
+            <br />
+        </div>
+
+        <!--------------------- VBench Prompt Enhancement --------------------->
+        <div class="container" id="prompt-enhancement">
+            <div align="center">
+                <h3>Prompt Enhancement on VBench</h3>
+            </div>
+            <hr />
+            <p>
+                We leverage LLMs to extend a short prompt to a detailed global caption and temporal captions, from which <strong>we can generate more interesting videos with richer motion</strong>.
+                The instruction we used for the LLM can be found at <a href="./src/vbench/prompt.txt">prompt</a>.
+                Here we compare with videos generated by our base model, using the original short prompt (dubbed <i>Short</i>), and the detailed global caption (dubbed <i>Global</i>).
+                This allows regular users to use our model without the tedious process of specifying events and timestamps.
+                Please refer to paper Appendix C.2 for more details.
+            </p>
+        </div>
+        <div class="container_video_1200">
+            <hr />
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40%">Captions</th>
+                        <th style="width: 20%">MinT <strong>(<span style="color: #ff0000;">Ours</span>)</strong></th>
+                        <th style="width: 20%">Short</th>
+                        <th style="width: 20%">Global</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="width: 40%; text-align: left;">
+                        <strong>Short caption</strong>: a cat drinking water.<br />
+                        <strong>Extended temporal captions:</strong><br />
+                        <span style="color: #b45f06;">[0.0s → 1.7s]: A fluffy, orange cat walks towards a ceramic water bowl.</span><br />
+                        <span style="color: #38761d;">[1.7s → 4.3s]: The cat has its pink nose dipping into the water as it begins to lap at the water with its tiny tongue.</span><br />
+                        <span style="color: #741a48;">[4.3s → 8.1s]: The cat lifts its head and glances around the room with its green eyes.</span><br />
+                        <br />
+                        Playback Speed:
+                        <select id="speedSelector11" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row11', 'speedSelector11')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                    <td style="width: 20%;"><video class="row11" style="width: 100%;" muted controls preload="none"><source src="src/vbench/110_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row11" style="width: 100%;" muted controls preload="none"><source src="src/vbench/short-110.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row11" style="width: 100%;" muted controls preload="none"><source src="src/vbench/global-110.mp4" type="video/mp4"></video></td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%; text-align: left;">
+                        <strong>Short caption</strong>: a bicycle accelerating to gain speed.<br />
+                        <strong>Extended temporal captions:</strong><br />
+                        <span style="color: #b45f06;">[0.0s → 2.2s]: The camera is at ground level capturing a close-up of the bicycle's wheels, standing still.</span><br />
+                        <span style="color: #38761d;">[2.2s → 4.0s]: The camera tilts up to show the rider lightly pushing down on the pedal with their foot.</span><br />
+                        <span style="color: #741a48;">[4.0s → 5.9s]: The camera zooms out to a medium shot, revealing the rider steadily pedaling while leaning forward.</span><br />
+                        <span style="color: #0076b9;">[5.9s → 8.1s]: A smooth track motion shows the bicycle racing down a street, gaining speed quickly.</span><br />
+                        <br />
+                        Playback Speed:
+                        <select id="speedSelector12" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row12', 'speedSelector12')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                    <td style="width: 20%;"><video class="row12" style="width: 100%;" muted controls preload="none"><source src="src/vbench/20_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row12" style="width: 100%;" muted controls preload="none"><source src="src/vbench/short-20.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row12" style="width: 100%;" muted controls preload="none"><source src="src/vbench/global-20.mp4" type="video/mp4"></video></td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%; text-align: left;">
+                        <strong>Short caption</strong>: a bear catching a salmon in its powerful jaws.<br />
+                        <strong>Extended temporal captions:</strong><br />
+                        <span style="color: #b45f06;">[0.0s → 2.5s]: A large brown bear standing waist-deep in a rushing river.</span><br />
+                        <span style="color: #38761d;">[2.5s → 4.3s]: The bear lunging catches a fish from the water.</span><br />
+                        <span style="color: #741a48;">[4.3s → 8.1s]: The bear clenches a silver salmon in its jaws and lifts its head triumphantly.</span><br />
+                        <br />
+                        Playback Speed:
+                        <select id="speedSelector13" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row13', 'speedSelector13')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                    <td style="width: 20%;"><video class="row13" style="width: 100%;" muted controls preload="none"><source src="src/vbench/0_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row13" style="width: 100%;" muted controls preload="none"><source src="src/vbench/short-0.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row13" style="width: 100%;" muted controls preload="none"><source src="src/vbench/global-0.mp4" type="video/mp4"></video></td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 40%; text-align: left;">
+                        <strong>Short caption</strong>: a bear climbing a tree.<br />
+                        <strong>Extended temporal captions:</strong><br />
+                        <span style="color: #b45f06;">[0.0s → 1.3s]: A brown bear walks towards a tall tree.</span><br />
+                        <span style="color: #38761d;">[1.3s → 3.3s]: The bear stands on its hind legs and places its front paws on the tree trunk.</span><br />
+                        <span style="color: #741a48;">[3.3s → 6.0s]: The bear slowly climbs higher up the tree.</span><br />
+                        <span style="color: #0076b9;">[6.0s → 8.1s]: The bear pauses to catch its breath.</span><br />
+                        <br />
+                        Playback Speed:
+                        <select id="speedSelector14" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row14', 'speedSelector14')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                    <td style="width: 20%;"><video class="row14" style="width: 100%;" muted controls preload="none"><source src="src/vbench/10_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row14" style="width: 100%;" muted controls preload="none"><source src="src/vbench/short-10.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row14" style="width: 100%;" muted controls preload="none"><source src="src/vbench/global-10.mp4" type="video/mp4"></video></td>
+                </tr>
+                </tbody>
+            </table>
+            <hr />
+            <br />
+            <br />
+        </div>
+
+        <!--------------------- Scene Cut Conditioning --------------------->
+        <div class="container" id="scene-cut-condition">
+            <div align="center">
+                <h3>Scene Cut Conditioning</h3>
+            </div>
+            <hr />
+            <p>
+                Long videos often contain rich events, yet they also come with many <a href="https://en.wikipedia.org/wiki/Shot_transition_detection">scene cuts</a>.
+                Directly training a video generator on them will lead to undesired abrupt shot transitions in the generation result.
+                Instead, we propose to <strong>explicitly condition the model on scene cut timestamps</strong> during training.
+                Once the model learns such conditioning, we can set them to zeros to generate a cut-free video at inference time.
+                <br />
+                Here, we compare <strong>videos generated with different scene cut conditionings</strong>.
+                We pause the video at input scene cut time (highlighted with <span style="color: #00dddd;">cyan borders</span>).
+                Our model introduces desired shot transitions and can still preserve the subject identities and scene backgrounds.
+                Please refer to paper Appendix C.3 for more analysis.
+            </p>
+        </div>
+        <div class="container_video_1200">
+            <hr />
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 13.3%">Temporal Captions</th>
+                        <th style="width: 20%">No Cut</th>
+                        <th style="width: 13.3%">Temporal Captions</th>
+                        <th style="width: 20%">After First Event</th>
+                        <th style="width: 13.3%">Temporal Captions</th>
+                        <th style="width: 20%">After All Events</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="width: 13.3%; text-align: center;">
+                        <span style="color: #b45f06;">[0.0s → 3.5s]: Event1</span><br />
+                        <span style="color: #38761d;">[3.5s → 6.0s]: Event2</span><br />
+                        <span style="color: #741a48;">[6.0s → 9.1s]: Event3</span><br />
+                    </td>
+                    <td style="width: 20%;"><video class="row21" style="width: 100%;" muted controls preload="none"><source src="src/scene_cut/nocut-0_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 13.3%; text-align: center;">
+                        <span style="color: #b45f06;">[0.0s → 3.5s]: Event1</span><br />
+                        <span style="color: #000000;"><strong>3.5s: Scene cut</strong></span><br />
+                        <span style="color: #38761d;">[3.5s → 6.0s]: Event2</span><br />
+                        <span style="color: #741a48;">[6.0s → 9.1s]: Event3</span><br />
+                    </td>
+                    <td style="width: 20%;"><video class="row21" style="width: 100%;" muted controls preload="none"><source src="src/scene_cut/onecut-0_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 13.3%; text-align: center;">
+                        <span style="color: #b45f06;">[0.0s → 3.5s]: Event1</span><br />
+                        <span style="color: #000000;"><strong>3.5s: Scene cut</strong></span><br />
+                        <span style="color: #38761d;">[3.5s → 6.0s]: Event2</span><br />
+                        <span style="color: #000000;"><strong>6.0s: Scene cut</strong></span><br />
+                        <span style="color: #741a48;">[6.0s → 9.1s]: Event3</span><br />
+                    </td>
+                    <td style="width: 20%;"><video class="row21" style="width: 100%;" muted controls preload="none"><source src="src/scene_cut/allcut-0_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="text-align: center; vertical-align: middle;">
+                        Playback Speed:
+                        <select id="speedSelector21" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row21', 'speedSelector21')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 13.3%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 2.7s]: Event1</span><br />
+                        <span style="color: #38761d;">[2.7s → 6.6s]: Event2</span><br />
+                        <span style="color: #741a48;">[6.6s → 9.3s]: Event3</span><br />
+                    </td>
+                    <td style="width: 20%;"><video class="row22" style="width: 100%;" muted controls preload="none"><source src="src/scene_cut/nocut-1_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 13.3%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 2.7s]: Event1</span><br />
+                        <span style="color: #000000;"><strong>2.7s: Scene cut</strong></span><br />
+                        <span style="color: #38761d;">[2.7s → 6.6s]: Event2</span><br />
+                        <span style="color: #741a48;">[6.6s → 9.3s]: Event3</span><br />
+                    </td>
+                    <td style="width: 20%;"><video class="row22" style="width: 100%;" muted controls preload="none"><source src="src/scene_cut/onecut-1_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 13.3%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 2.7s]: Event1</span><br />
+                        <span style="color: #000000;"><strong>2.7s: Scene cut</strong></span><br />
+                        <span style="color: #38761d;">[2.7s → 6.6s]: Event2</span><br />
+                        <span style="color: #000000;"><strong>6.6s: Scene cut</strong></span><br />
+                        <span style="color: #741a48;">[6.6s → 9.3s]: Event3</span><br />
+                    </td>
+                    <td style="width: 20%;"><video class="row22" style="width: 100%;" muted controls preload="none"><source src="src/scene_cut/allcut-1_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="text-align: center; vertical-align: middle;">
+                        Playback Speed:
+                        <select id="speedSelector22" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row22', 'speedSelector22')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 13.3%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 1.9s]: Event1</span><br />
+                        <span style="color: #38761d;">[1.9s → 4.0s]: Event2</span><br />
+                        <span style="color: #741a48;">[4.0s → 6.2s]: Event3</span><br />
+                        <span style="color: #0076b9;">[6.2s → 9.1s]: Event4</span><br />
+                    </td>
+                    <td style="width: 20%;"><video class="row23" style="width: 100%;" muted controls preload="none"><source src="src/scene_cut/nocut-2_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 13.3%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 1.9s]: Event1</span><br />
+                        <span style="color: #000000;"><strong>1.9s: Scene cut</strong></span><br />
+                        <span style="color: #38761d;">[1.9s → 4.0s]: Event2</span><br />
+                        <span style="color: #741a48;">[4.0s → 6.2s]: Event3</span><br />
+                        <span style="color: #0076b9;">[6.2s → 9.1s]: Event4</span><br />
+                    </td>
+                    <td style="width: 20%;"><video class="row23" style="width: 100%;" muted controls preload="none"><source src="src/scene_cut/onecut-2_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 13.3%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 1.9s]: Event1</span><br />
+                        <span style="color: #000000;"><strong>1.9s: Scene cut</strong></span><br />
+                        <span style="color: #38761d;">[1.9s → 4.0s]: Event2</span><br />
+                        <span style="color: #000000;"><strong>4.0s: Scene cut</strong></span><br />
+                        <span style="color: #741a48;">[4.0s → 6.2s]: Event3</span><br />
+                        <span style="color: #000000;"><strong>6.2s: Scene cut</strong></span><br />
+                        <span style="color: #0076b9;">[6.2s → 9.1s]: Event4</span><br />
+                    </td>
+                    <td style="width: 20%;"><video class="row23" style="width: 100%;" muted controls preload="none"><source src="src/scene_cut/allcut-2_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="text-align: center; vertical-align: middle;">
+                        Playback Speed:
+                        <select id="speedSelector23" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row23', 'speedSelector23')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <hr />
+            <br />
+            <br />
+        </div>
+
+        <!--------------------- Event Time Span Control --------------------->
+        <div class="container" id="time-control">
+            <div align="center">
+                <h3>Event Time Span Control</h3>
+            </div>
+            <hr />
+            <p>
+                We show MinT's fine-grained control of event timings.
+                In each example, we offset the stard and end time of all events by a specific value.
+                Each row thus shows a smooth progress of events happening.
+                Please refer to paper Appendix C.4 for more details.
+            </p>
+        </div>
+        <div class="container_video_1200">
+            <hr />
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%">-1.0s</th>
+                        <th style="width: 20%">-0.5s</th>
+                        <th style="width: 20%">Original Timestamps</th>
+                        <th style="width: 20%">+0.5s</th>
+                        <th style="width: 20%">+1.0s</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="width: 20%;"><video class="row31" style="width: 100%;" muted controls preload="none"><source src="src/time_control/0--1.0_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row31" style="width: 100%;" muted controls preload="none"><source src="src/time_control/0--0.5_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row31" style="width: 100%;" muted controls preload="none"><source src="src/time_control/0-0_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row31" style="width: 100%;" muted controls preload="none"><source src="src/time_control/0-0.5_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row31" style="width: 100%;" muted controls preload="none"><source src="src/time_control/0-1.0_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr>
+                    <td colspan="5" style="text-align: center; vertical-align: middle;">
+                        Playback Speed:
+                        <select id="speedSelector31" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row31', 'speedSelector31')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%;"><video class="row32" style="width: 100%;" muted controls preload="none"><source src="src/time_control/7--1.0_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row32" style="width: 100%;" muted controls preload="none"><source src="src/time_control/7--0.5_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row32" style="width: 100%;" muted controls preload="none"><source src="src/time_control/7-0_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row32" style="width: 100%;" muted controls preload="none"><source src="src/time_control/7-0.5_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row32" style="width: 100%;" muted controls preload="none"><source src="src/time_control/7-1.0_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr>
+                    <td colspan="5" style="text-align: center; vertical-align: middle;">
+                        Playback Speed:
+                        <select id="speedSelector32" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row32', 'speedSelector32')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                </tr>
+                <!-- Add a horizontal line between the button row and the next row of videos -->
+                <tr>
+                    <td colspan="6">
+                        <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%;"><video class="row33" style="width: 100%;" muted controls preload="none"><source src="src/time_control/9--1.0_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row33" style="width: 100%;" muted controls preload="none"><source src="src/time_control/9--0.5_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row33" style="width: 100%;" muted controls preload="none"><source src="src/time_control/9-0_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row33" style="width: 100%;" muted controls preload="none"><source src="src/time_control/9-0.5_subtitle.mp4" type="video/mp4"></video></td>
+                    <td style="width: 20%;"><video class="row33" style="width: 100%;" muted controls preload="none"><source src="src/time_control/9-1.0_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr>
+                    <td colspan="5" style="text-align: center; vertical-align: middle;">
+                        Playback Speed:
+                        <select id="speedSelector33" style="font-size: 18px; padding: 5px;">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2x</option>
+                        </select>
+                        <button onclick="playAllVideos('row33', 'speedSelector33')" class="play-button">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <hr />
+            <br />
+            <br />
+        </div>
+
+        <!--------------------- Failure Case Analysis --------------------->
+        <div class="container" id="failure-case">
+            <div align="center">
+                <h3>Failure Case Analysis</h3>
+            </div>
+            <hr />
+            <p>
+                Here, we show several representative failure cases of our model.
+                <br />
+                1. Since we fine-tune from a pre-trained video diffusion model, we inherit all its limitations.
+                The following two examples show that MinT fails to handle human hands and complex physics well.
+            </p>
+        </div>
+        <div class="container">
+            <hr />
+            <!-- <div align="center">
+                <h5>
+                    <table style="width: 100%; text-align: center">
+                        <tr>
+                            <td style="width: 60%">Temporal Captions</td>
+                            <td style="width: 40%">MinT <strong>(Ours)</strong></td>
+                        </tr>
+                    </table>
+                </h5>
+            </div> -->
+            <table style="width: 100%; text-align: center; table-layout: fixed;">
+                <tr>
+                    <td style="width: 60%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 2.5s]: The person on the left strokes the woman's hand.</span><br />
+                        <span style="color: #38761d;">[2.5s → 6.0s]: The person holds the woman's hand firmly. The camera tilts up.</span><br />
+                        <span style="color: #741a48;">[6.0s → 9.1s]: The woman responds to the person. The camera tilts up and dollies backward.</span>
+                    </td>
+                    <td style="width: 40%;"><video id="myVideo" style="width: 100%;" muted controls preload="none"><source src="src/failure_case/human_hand_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr style="height: 20px;"><td colspan="2"></td></tr>  <!-- vspace -->
+                <tr>
+                    <td style="width: 60%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 3.3s]: A light-skinned person cuts a strawberry with a knife.</span><br />
+                        <span style="color: #38761d;">[3.3s → 5.9s]: The person cuts the strawberry into four pieces.</span><br />
+                        <span style="color: #741a48;">[5.9s → 9.1s]: The person pushes the strawberry pieces towards the left with a knife.</span>
+                    </td>
+                    <td style="width: 40%;"><video id="myVideo" style="width: 100%;" muted controls preload="none"><source src="src/failure_case/complex_physics_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr style="height: 20px;"><td colspan="2"></td></tr>  <!-- vspace -->
+            </table>
+            <hr />
+            <p>
+                2. Another failure case is multi-subject scenes.
+                The below example shows a video with multiple persons, where MinT fails to bind attributes and actions to the correct person.
+                While we mainly focus on <i>temporal binding</i> in this paper, this issue might be solved with <i>spatial binding</i>, such as bounding box controlled video generation [8].
+            </p>
+            <hr />
+            <table style="width: 100%; text-align: center; table-layout: fixed;">
+                <tr>
+                    <td style="width: 60%; text-align: left;">
+                        <span style="color: #b45f06;">[0.0s → 3.4s]: The dark-skinned man says something, and the fair-skinned man holds a piece of pizza in his right hand and points his left hand to the tan-skinned man. The tan-skinned man is holding a piece of pizza in his left hand.</span><br />
+                        <span style="color: #38761d;">[3.4s → 6.1s]: The fair-skinned man points at the TV with his left hand while the tan-skinned man eats the pizza, and the dark-skinned man looks at the TV.</span><br />
+                        <span style="color: #741a48;">[6.1s → 9.1s]: The fair-skinned man picks up a green bottle of cold drink and drinks it while the tan-skinned man picks up a green bottle, and the dark-skinned man looks at the TV.</span>
+                    </td>
+                    <td style="width: 40%;"><video id="myVideo" style="width: 100%;" muted controls preload="none"><source src="src/failure_case/multi_subject_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+                <tr style="height: 20px;"><td colspan="2"></td></tr>  <!-- vspace -->
+            </table>
+            <hr />
+            <p>
+                3. MinT sometimes fails to link subjects between global and temporal captions.
+                In this example, a woman is described to "wear a <i>gray-red device</i> on her eyes" in the global caption.
+                However, when prompted to "adjust the <i>gray-red device</i>" in the second event, she lifts a new device instead of the one on her eye.
+                <br />
+                We tried some simple solutions such as running a cross-attention between text embeddings of global and temporal captions before inputting them to the DiT, hoping it can learn to associate subjects, but it did not help.
+                Yet, this "binding" problem may simply be solved with more training data, which we leave for future work.
+            </p>
+            <hr />
+            <table style="width: 100%; text-align: center; table-layout: fixed;">
+                <tr>
+                    <td style="width: 60%; text-align: left;">
+                        <strong>Global caption</strong>: A woman is doing eye-checking test. She wears a <i>gray-red device</i> on her eyes and ...<br />
+                        <span style="color: #b45f06;">[0.0s → 2.8s]: A woman looks forward.</span><br />
+                        <span style="color: #38761d;">[2.8s → 6.3s]: The woman moves his hands up, adjusts the <i>gray-red device</i>, and moves her hands down.</span><br />
+                        <span style="color: #741a48;">[6.3s → 9.1s]: The woman looks forward and nods her head.</span>
+                    </td>
+                    <td style="width: 40%;"><video id="myVideo" style="width: 100%;" muted controls preload="none"><source src="src/failure_case/global_temporal_binding_subtitle.mp4" type="video/mp4"></video></td>
+                </tr>
+            </table>
+            <hr />
+            <br />
+            <br />
+        </div>
+
+        <!--------------------- References --------------------->
+        <br /><br />
+        <div class="container">
+            <div align="center"><h2>References</h2></div>
+            <hr />
+            <p>
+                [1] CogVideoX-5B. <a href="https://huggingface.co/spaces/THUDM/CogVideoX-5B-Space">https://huggingface.co/spaces/THUDM/CogVideoX-5B-Space</a>.
+                <br />
+                [2] Mochi 1. <a href="https://www.genmo.ai/play">https://www.genmo.ai/play</a>.
+                <br />
+                [3] Kling 1.5. <a href="https://klingai.com/">https://klingai.com/</a>.
+                <br />
+                [4] Gen-3 Alpha. <a href="https://runwayml.com/research/introducing-gen-3-alpha">https://runwayml.com/research/introducing-gen-3-alpha</a>.
+                <br />
+                [5] Peebles, William, and Saining Xie. "Scalable diffusion models with transformers." ICCV. 2023.
+                <br />
+                [6] Su, Jianlin, et al. "RoFormer: Enhanced transformer with rotary position embedding." Neurocomputing. 2024.
+                <br />
+                [7] Huang, Ziqi, et al. "VBench: Comprehensive benchmark suite for video generative models." CVPR. 2024.
+                <br />
+                [8] Lian, Long, et al. "LLM-Grounded video diffusion models." ICLR. 2024.
+            </p>
+        </div>
+
+        <br /><br /><br />
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Play each video briefly to load the initial frame
+                const videos = document.querySelectorAll('video');
+                videos.forEach(video => {
+                    video.currentTime = 0; // Ensure video starts from the beginning
+                    video.play();
+
+                    // Pause the video after a short delay
+                    setTimeout(() => {
+                        video.pause();
+                    }, 10); // 10 milliseconds should be enough to load the first frame
+                });
+            });
+
+            function playAllVideos(rowClass, speedSelectorId) {
+                // Find all video elements with the specified class
+                const videos = document.querySelectorAll('video.' + rowClass);
+                const speed = document.getElementById(speedSelectorId).value;
+                videos.forEach(video => {
+                    // Set its playback speed
+                    video.playbackRate = parseFloat(speed);
+                    // Pause all videos and reset their current time to 0
+                    video.currentTime = 0;
+                    video.play();
+                });
+            }
+        </script>
+    </body>
+</html>
