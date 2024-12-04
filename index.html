@@ -107,8 +107,11 @@
     <body>
         <div class="jumbotron jumbotron-fluid">
             <div class="container_title" align="center">
+                <h1>
+                    Mind the Time:
+                </h1>
                 <h2>
-                    Mind the Time: Temporally-Controlled Multi-Event Video Generation
+                    Temporally-Controlled Multi-Event Video Generation
                 </h2>
                 <h4><i>arXiv 2024</i></h4>
                 <p>
@@ -138,7 +141,7 @@
         <!--------------------- Teaser Video --------------------->
         <div class="container">
             <h4>TL;DR: </h4>
-            <p style="font-size: 20px;">MinT is a text-to-video model that generates sequential events with precise timestamp control.</p>
+            <p style="font-size: 22px;">MinT is the first text-to-video model capable of generating sequential events and controlling their timestamps.</p>
             <video style="width: 100%;" muted controls preload="none"><source src="src/Teaser.mp4" type="video/mp4"></video>
             <br />
         </div>
@@ -781,7 +784,7 @@
             <hr />
             <p>
                 We show MinT's fine-grained control of event timings.
-                In each example, we offset the stard and end time of all events by a specific value.
+                In each example, we offset the start and end time of all events by a specific value.
                 Each row thus shows a smooth progress of events happening.
                 Please refer to paper Appendix C.4 for more details.
             </p>
@@ -968,6 +971,20 @@
             <hr />
             <br />
             <br />
+        </div>
+
+        <!--------------------- BibTeX --------------------->
+        <div class="container" id="bibtex">
+            <div align="center"><h2>BibTeX</h2></div>
+            <hr />
+            If you find our work useful, please consider citing our paper:
+            <pre><code>
+@article{MinT,
+    title     = {Mind the Time: Temporally-Controlled Multi-Event Video Generation},
+    author    = {Wu, Ziyi and Siarohin, Aliaksandr and Menapace, Willi and Skorokhodov, Ivan and Fang, Yuwei and Chordia, Varnith and Gilitschenski, Igor and Tulyakov, Sergey},
+    journal   = {arXiv preprint arXiv:},
+    year      = {2024}
+}</code></pre>
         </div>
 
         <!--------------------- References --------------------->
