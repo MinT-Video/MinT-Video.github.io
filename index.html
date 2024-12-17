@@ -49,6 +49,14 @@
                 width: 100%;
                 max-width: 1600px;
             }
+            .container_video_1400 {
+                zoom: 1;
+                margin-left: auto;
+                margin-right: auto;
+                vertical-align: middle;
+                width: 100%;
+                max-width: 1400px;
+            }
             .container_video_1200 {
                 zoom: 1;
                 margin-left: auto;
@@ -225,11 +233,174 @@
         </div>
 
         <!--------------------- Compare with SOTA --------------------->
-        <div class="container" id="compare-with-sota">
+        <div class="container" id="compare-with-sora">
             <div align="center">
-                <h3>Comparison with SOTA Models</h3>
+                <h2>Comparison with SOTA Models</h2>
             </div>
             <hr />
+            <div align="center">
+                <h3><b style="color: green; background-color: #ffff42">NEW!</b> Comparison with Sora</h3>
+            </div>
+            <p>
+                Sora [9] has a storyboard function (released one week after MinT) that supports multiple text prompts + time control.
+                We run Sora with the same event captions and timestamps as our model and compare the results below.
+                Despite being designed for this task, Sora still sometimes misses events, introduces undesired scene cuts, and is inaccurate on the event timing.
+            </p>
+        </div>
+        <div class="container_video_1400">
+                <hr />
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 33%;">Temporal Captions</th>
+                            <th style="width: 33%;">MinT <strong>(<span style="color: #ff0000;">Ours</span>)</strong></th>
+                            <th style="width: 33%;">Sora (Storyboard)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td style="width: 33%; text-align: left;">
+                            <span style="color: #b45f06;">[0.0s → 2.3s]: A man lifts up his head and raises up both arms.</span><br />
+                            <span style="color: #38761d;">[2.3s → 4.5s]: The man lowers down his head and puts down both arms.</span><br />
+                            <span style="color: #741a48;">[4.5s → 6.8s]: The man turns his head to the right and extends both arms to the right.</span><br />
+                            <span style="color: #0076b9;">[6.8s → 9.1s]: The man turns his head to the left and extends both arms to the left.</span><br />
+                            <br />
+                            Playback Speed:
+                            <select id="speedSelector001" style="font-size: 18px; padding: 5px;">
+                                <option value="0.5">0.5x</option>
+                                <option value="1" selected>1x</option>
+                                <option value="1.5">1.5x</option>
+                                <option value="2">2x</option>
+                            </select>
+                            <button onclick="playAllVideos('row001', 'speedSelector001')" class="play-button">
+                                <i class="fas fa-play"></i> Play All
+                            </button>
+                        </td>
+                        <td style="width: 33%;"><video class="row001" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/man_arms_actions_subtitle.mp4" type="video/mp4"></video></td>
+                        <td style="width: 33%;"><video class="row001" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/sora-man_arms_actions.mp4" type="video/mp4"></video></td>
+                    </tr>
+                    <!-- Add a horizontal line between the button row and the next row of videos -->
+                    <tr>
+                        <td colspan="6">
+                            <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 33%; text-align: left;">
+                            <span style="color: #b45f06;">[0.0s → 2.3s]: A young man typing on the laptop keyboard with both hands.</span><br />
+                            <span style="color: #38761d;">[2.3s → 4.5s]: The man touches the headphones with his right hand.</span><br />
+                            <span style="color: #741a48;">[4.5s → 6.5s]: The man closes the laptop with his left hand.</span><br />
+                            <span style="color: #0076b9;">[6.5s → 9.1s]: The man stands up.</span><br />
+                            <br />
+                            Playback Speed:
+                            <select id="speedSelector002" style="font-size: 18px; padding: 5px;">
+                                <option value="0.5">0.5x</option>
+                                <option value="1" selected>1x</option>
+                                <option value="1.5">1.5x</option>
+                                <option value="2">2x</option>
+                            </select>
+                            <button onclick="playAllVideos('row002', 'speedSelector002')" class="play-button">
+                                <i class="fas fa-play"></i> Play All
+                            </button>
+                        </td>
+                        <td style="width: 33%;"><video class="row002" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/man_laptop_actions_subtitle.mp4" type="video/mp4"></video></td>
+                        <td style="width: 33%;"><video class="row002" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/sora-man_laptop_actions.mp4" type="video/mp4"></video></td>
+                    </tr>
+                    <!-- Add a horizontal line between the button row and the next row of videos -->
+                    <tr>
+                        <td colspan="6">
+                            <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 33%; text-align: left;">
+                            <span style="color: #b45f06;">[0.0s → 1.8s]: The woman is holding the phone in her left hand, looking at it while tapping on it with her right hand.</span><br />
+                            <span style="color: #38761d;">[1.8s → 3.8s]: The woman holds the phone with both hands, extending them forward at face level to take a selfie.</span><br />
+                            <span style="color: #741a48;">[3.8s → 7.0s]: The woman lowers the phone and begins typing on it with her right hand.</span><br />
+                            <span style="color: #0076b9;">[7.0s → 12.2s]: The woman adjusts her hair with her right hand, tucking it behind her left ear.</span><br />
+                            <br />
+                            Playback Speed:
+                            <select id="speedSelector003" style="font-size: 18px; padding: 5px;">
+                                <option value="0.5">0.5x</option>
+                                <option value="1" selected>1x</option>
+                                <option value="1.5">1.5x</option>
+                                <option value="2">2x</option>
+                            </select>
+                            <button onclick="playAllVideos('row003', 'speedSelector003')" class="play-button">
+                                <i class="fas fa-play"></i> Play All
+                            </button>
+                        </td>
+                        <td style="width: 33%;"><video class="row003" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/072_subtitle.mp4" type="video/mp4"></video></td>
+                        <td style="width: 33%;"><video class="row003" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/sora-72_woman_selfie.mp4" type="video/mp4"></video></td>
+                    </tr>
+                    <!-- Add a horizontal line between the button row and the next row of videos -->
+                    <tr>
+                        <td colspan="6">
+                            <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 33%; text-align: left;">
+                            <span style="color: #b45f06;">[0.0s → 1.2s]: The man holds an tablet with his left hand and uses it with his right hand.</span><br />
+                            <span style="color: #38761d;">[1.2s → 5.6s]: The man looks at the blue bottles on his left and points his right hand towards them.</span><br />
+                            <span style="color: #741a48;">[5.6s → 6.5s]: The man looks at the tablet and uses it with his right hand.</span><br />
+                            <span style="color: #0076b9;">[6.5s → 12.2s]: The man looks at the camera while holding the tablet with his left hand.</span><br />
+                            <br />
+                            Playback Speed:
+                            <select id="speedSelector004" style="font-size: 18px; padding: 5px;">
+                                <option value="0.5">0.5x</option>
+                                <option value="1" selected>1x</option>
+                                <option value="1.5">1.5x</option>
+                                <option value="2">2x</option>
+                            </select>
+                            <button onclick="playAllVideos('row004', 'speedSelector004')" class="play-button">
+                                <i class="fas fa-play"></i> Play All
+                            </button>
+                        </td>
+                        <td style="width: 33%;"><video class="row004" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/061_subtitle.mp4" type="video/mp4"></video></td>
+                        <td style="width: 33%;"><video class="row004" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/sora-61_ipad_room.mp4" type="video/mp4"></video></td>
+                    </tr>
+                    <!-- Add a horizontal line between the button row and the next row of videos -->
+                    <tr>
+                        <td colspan="6">
+                            <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 33%; text-align: left;">
+                            <span style="color: #b45f06;">[0.0s → 2.1s]: The woman waves with her right hand.</span><br />
+                            <span style="color: #38761d;">[2.1s → 7.5s]: The woman talks gesturing with her hands.</span><br />
+                            <span style="color: #741a48;">[7.5s → 10.5s]: The woman makes a heart gesture.</span><br />
+                            <span style="color: #0076b9;">[10.5s → 12.2s]: The woman gives a blow kiss with her right hand.</span><br />
+                            <br />
+                            Playback Speed:
+                            <select id="speedSelector005" style="font-size: 18px; padding: 5px;">
+                                <option value="0.5">0.5x</option>
+                                <option value="1" selected>1x</option>
+                                <option value="1.5">1.5x</option>
+                                <option value="2">2x</option>
+                            </select>
+                            <button onclick="playAllVideos('row005', 'speedSelector005')" class="play-button">
+                                <i class="fas fa-play"></i> Play All
+                            </button>
+                        </td>
+                        <td style="width: 33%;"><video class="row005" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/130_subtitle.mp4" type="video/mp4"></video></td>
+                        <td style="width: 33%;"><video class="row005" style="width: 100%;" muted controls preload="none"><source src="src/vs_sota/sora-130_woman_gesture.mp4" type="video/mp4"></video></td>
+                    </tr>
+                    <!-- Add a horizontal line between the button row and the next row of videos -->
+                    <tr>
+                        <td colspan="6">
+                            <hr style="border: 1px solid #ddd; margin: 10px 0;">
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+            <br />
+            </div>
+            <div class="container" id="compare-with-sota">
+            <div align="center">
+                <h3>Comparison with Other SOTA Models</h3>
+            </div>
             <p>
                 Existing video generators struggle with sequential event generation.
                 We compare with SOTA open-source models CogVideoX-5B [1] and Mochi 1 [2], and commercial models Kling 1.5 [3] and Gen3-Alpha [4].
@@ -1008,6 +1179,8 @@
                 [7] Huang, Ziqi, et al. "VBench: Comprehensive benchmark suite for video generative models." CVPR. 2024.
                 <br />
                 [8] Lian, Long, et al. "LLM-Grounded video diffusion models." ICLR. 2024.
+                <br />
+                [9] Sora. <a href="https://sora.com/">https://sora.com/</a>.
             </p>
         </div>
 
